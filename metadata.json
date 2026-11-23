@@ -1,0 +1,6 @@
+{
+  "name": "AegisSelf Intelligence Vault",
+  "description": "Zero-trust personal health and habit intelligence vault unifying analog medical lab records and wearable telemetry under cryptographic smart-contract ownership.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

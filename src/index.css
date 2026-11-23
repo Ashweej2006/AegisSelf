@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-vault-canvas: #F8FAFC;
+  --color-vault-surface: #FFFFFF;
+  --color-vault-surface-low: #EFF4FF;
+  --color-vault-slate: #0F172A;
+  --color-vault-ink: #0B1C30;
+  --color-vault-muted: #64748B;
+  --color-vault-border: #E2E8F0;
+  --color-vault-emerald: #10B981;
+  --color-vault-emerald-deep: #006C49;
+  --color-vault-cyan: #06B6D4;
+  --color-vault-cyan-deep: #0090A9;
+  --color-vault-crimson: #BA1A1A;
+  --color-vault-amber: #D97706;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    color: var(--color-vault-ink);
+    background-color: var(--color-vault-canvas);
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  button, a, input, select, textarea {
+    outline-color: #06B6D4;
+  }
+}
+
+.vault-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.02);
+}
+
+.vault-frosted {
+  background-color: rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.05), 0 4px 6px -4px rgba(15, 23, 42, 0.02);
+}
+
+.vault-modal {
+  background-color: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+}
+
+.vault-input {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  transition: border-color 150ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.vault-input:focus {
+  outline: none;
+  border-color: #06B6D4;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+}
+
+.dither-pattern {
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(255, 255, 255, 0.85) 1px, rgba(255, 255, 255, 0.85) 2px),
+    repeating-linear-gradient(90deg, transparent 0px, transparent 1px, rgba(255, 255, 255, 0.85) 1px, rgba(255, 255, 255, 0.85) 2px);
+  background-size: 3px 3px;
+}
+
+.stars-bg {
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.9), transparent),
+    radial-gradient(1px 1px at 60% 70%, rgba(6, 182, 212, 0.85), transparent),
+    radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1px 1px at 80% 10%, rgba(255, 255, 255, 0.75), transparent),
+    radial-gradient(1px 1px at 90% 60%, rgba(16, 185, 129, 0.75), transparent),
+    radial-gradient(1px 1px at 33% 80%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 15% 60%, rgba(6, 182, 212, 0.7), transparent),
+    radial-gradient(1px 1px at 70% 40%, rgba(255, 255, 255, 0.85), transparent);
+  background-size: 200% 200%, 180% 180%, 250% 250%, 220% 220%, 190% 190%, 240% 240%, 210% 210%, 230% 230%;
+  background-position: 0% 0%, 40% 40%, 60% 60%, 20% 20%, 80% 80%, 30% 30%, 70% 70%, 50% 50%;
+  opacity: 0.38;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
