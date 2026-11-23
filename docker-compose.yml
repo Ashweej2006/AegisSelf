@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: aegis_postgres
+    environment:
+      POSTGRES_DB: aegis_vault_db
+      POSTGRES_USER: aegis_admin
+      POSTGRES_PASSWORD: aegis_super_secure_vault_pass_2026
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aegis_admin -d aegis_vault_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: aegis_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  ganache:
+    image: trufflesuite/ganache-cli:latest
+    container_name: aegis_ganache
+    ports:
+      - "8545:8545"
+    command: ["--deterministic", "--mnemonic", "myth like bonus scare over problem client lizard pioneer submit female collect", "--networkId", "5777"]
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: aegis_django_api
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py shell -c 'from vault.demo_data import seed_demo_vault; seed_demo_vault()' &&
+             gunicorn aegis_backend.wsgi:application --bind 0.0.0.0:8000 --workers 3"
+    environment:
+      - DJANGO_SETTINGS_MODULE=aegis_backend.settings
+      - DATABASE_URL=postgresql://aegis_admin:aegis_super_secure_vault_pass_2026@db:5432/aegis_vault_db
+      - REDIS_URL=redis://redis:6379/0
+      - GANACHE_RPC_URL=http://ganache:8545
+      - AEGIS_MASTER_VAULT_KEY=AegisSelfZeroTrustSuperSecretMasterKey32BytesLong!
+      - DEBUG=False
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      ganache:
+        condition: service_started
+
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: aegis_celery_worker
+    command: celery -A aegis_backend worker -l info --concurrency=2
+    environment:
+      - DJANGO_SETTINGS_MODULE=aegis_backend.settings
+      - DATABASE_URL=postgresql://aegis_admin:aegis_super_secure_vault_pass_2026@db:5432/aegis_vault_db
+      - REDIS_URL=redis://redis:6379/0
+      - GANACHE_RPC_URL=http://ganache:8545
+      - AEGIS_MASTER_VAULT_KEY=AegisSelfZeroTrustSuperSecretMasterKey32BytesLong!
+    depends_on:
+      - backend
+      - redis
+
+  celery_beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: aegis_celery_beat
+    command: celery -A aegis_backend beat -l info
+    environment:
+      - DJANGO_SETTINGS_MODULE=aegis_backend.settings
+      - DATABASE_URL=postgresql://aegis_admin:aegis_super_secure_vault_pass_2026@db:5432/aegis_vault_db
+      - REDIS_URL=redis://redis:6379/0
+      - GANACHE_RPC_URL=http://ganache:8545
+      - AEGIS_MASTER_VAULT_KEY=AegisSelfZeroTrustSuperSecretMasterKey32BytesLong!
+    depends_on:
+      - backend
+      - redis
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: aegis_react_ui
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  redis_data:
