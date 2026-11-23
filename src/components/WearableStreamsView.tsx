@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import {
   Activity,
   BatteryCharging,
@@ -94,12 +95,16 @@ export const WearableStreamsView: React.FC<WearableStreamsViewProps> = ({
       {/* Connected Biometric Sensors */}
       <section aria-label="Connected wearable sensors">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {wearables.map((device) => {
+          {wearables.map((device, idx) => {
             const isStreaming = device.status === 'streaming';
             return (
-              <article
+              <motion.article
                 key={device.id}
-                className="vault-card rounded-2xl p-6 flex flex-col justify-between gap-5"
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: idx * 0.08 }}
+                whileHover={{ y: -3, transition: { duration: 0.2 } }}
+                className="vault-card rounded-2xl p-6 flex flex-col justify-between gap-5 hover:shadow-md transition-shadow"
               >
                 <div>
                   <div className="flex items-start justify-between gap-3">
@@ -112,12 +117,14 @@ export const WearableStreamsView: React.FC<WearableStreamsViewProps> = ({
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-1.5 text-xs font-mono font-medium shrink-0">
-                      {isStreaming && (
-                        <span
-                          className="w-2 h-2 rounded-full bg-[#06B6D4]"
-                          aria-hidden="true"
-                        />
+                    <div className="flex items-center gap-2 text-xs font-mono font-medium shrink-0">
+                      {isStreaming ? (
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                        </span>
+                      ) : (
+                        <span className="w-2 h-2 rounded-full bg-slate-300" />
                       )}
                       <span className={isStreaming ? 'text-[#0090A9]' : 'text-slate-500'}>
                         {isStreaming ? 'Live Stream' : 'Paused'}
@@ -218,7 +225,7 @@ export const WearableStreamsView: React.FC<WearableStreamsViewProps> = ({
                     </button>
                   </div>
                 </div>
-              </article>
+              </motion.article>
             );
           })}
         </div>

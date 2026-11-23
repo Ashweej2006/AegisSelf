@@ -29,6 +29,9 @@ import { LabVaultView } from './components/LabVaultView';
 import { WearableStreamsView } from './components/WearableStreamsView';
 import { AnomaliesNudgesView } from './components/AnomaliesNudgesView';
 import { SmartContractsView } from './components/SmartContractsView';
+import HalftoneWordmarkFooter from './components/HalftoneWordmarkFooter';
+import { BiometricScanModal } from './components/BiometricScanModal';
+import { VoiceBriefingModal } from './components/VoiceBriefingModal';
 
 const STORAGE_KEY = 'aegisself_vault_state_v1';
 
@@ -78,6 +81,9 @@ export default function App() {
   const [ingestLabOpen, setIngestLabOpen] = useState(false);
   const [createNudgeOpen, setCreateNudgeOpen] = useState(false);
   const [deployContractOpen, setDeployContractOpen] = useState(false);
+  const [isBiometricUnlocked, setIsBiometricUnlocked] = useState(false);
+  const [biometricModalOpen, setBiometricModalOpen] = useState(false);
+  const [voiceBriefingOpen, setVoiceBriefingOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -608,6 +614,9 @@ export default function App() {
             onOpenMobileMenu={() => setMobileMenuOpen(true)}
             primaryActionLabel={topBarAction.label}
             onPrimaryAction={topBarAction.handler}
+            isBiometricUnlocked={isBiometricUnlocked}
+            onOpenBiometricScan={() => setBiometricModalOpen(true)}
+            onOpenVoiceBriefing={() => setVoiceBriefingOpen(true)}
           />
 
           <main className="flex-1 w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
@@ -645,6 +654,9 @@ export default function App() {
               onVerifyVault={handleVerifyVault}
               onToggleNudgeComplete={handleToggleNudgeComplete}
               onNavigate={setActiveScreen}
+              isBiometricUnlocked={isBiometricUnlocked}
+              onOpenBiometricScan={() => setBiometricModalOpen(true)}
+              onOpenVoiceBriefing={() => setVoiceBriefingOpen(true)}
             />
           )}
 
@@ -702,8 +714,33 @@ export default function App() {
             />
           )}
           </main>
+
+          <HalftoneWordmarkFooter
+            wordmark="AegisSelf"
+            label="AegisSelf Vault"
+            meta="©2026 · Zero-Trust Health Intelligence"
+          />
         </div>
       </div>
+
+      <BiometricScanModal
+        isOpen={biometricModalOpen}
+        onClose={() => setBiometricModalOpen(false)}
+        onSuccess={() => {
+          setIsBiometricUnlocked(true);
+          setBiometricModalOpen(false);
+          setToastMessage(
+            'Biometric Liveness Verified: 128-D OpenCV Embedding Matched (FAR < 0.04%). Session Unlocked.'
+          );
+        }}
+        isUnlocked={isBiometricUnlocked}
+      />
+
+      <VoiceBriefingModal
+        isOpen={voiceBriefingOpen}
+        onClose={() => setVoiceBriefingOpen(false)}
+        vaultId={vault.vaultId}
+      />
     </div>
   );
 }

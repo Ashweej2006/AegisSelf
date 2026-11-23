@@ -1,10 +1,14 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import {
   AlertTriangle,
   ArrowRight,
   Check,
   Lock,
+  Unlock,
   ShieldCheck,
+  ScanFace,
+  Radio,
 } from 'lucide-react';
 import type {
   AccessSmartContract,
@@ -33,6 +37,9 @@ interface OverviewViewProps {
   onVerifyVault: () => void;
   onToggleNudgeComplete: (id: string) => void;
   onNavigate: (screen: VaultScreen) => void;
+  isBiometricUnlocked?: boolean;
+  onOpenBiometricScan?: () => void;
+  onOpenVoiceBriefing?: () => void;
 }
 
 export const OverviewView: React.FC<OverviewViewProps> = ({
@@ -47,6 +54,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
   onVerifyVault,
   onToggleNudgeComplete,
   onNavigate,
+  isBiometricUnlocked = false,
+  onOpenBiometricScan,
+  onOpenVoiceBriefing,
 }) => {
   const recent14 = telemetry.slice(-14);
   const latest = telemetry[telemetry.length - 1];
@@ -129,19 +139,35 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         aria-label="Zero-trust encryption seal"
       >
         <div className="flex items-start sm:items-center gap-3.5 min-w-0">
-          <div className="w-10 h-10 rounded-xl bg-[#0F172A] text-white flex items-center justify-center shrink-0">
-            <Lock className="w-4 h-4 text-[#10B981]" />
-          </div>
+          <motion.div
+            animate={{
+              boxShadow: isBiometricUnlocked
+                ? ['0 0 0px #10B981', '0 0 14px #10B981', '0 0 0px #10B981']
+                : 'none',
+            }}
+            transition={{ repeat: Infinity, duration: 2.5 }}
+            className={`w-10 h-10 rounded-xl text-white flex items-center justify-center shrink-0 transition-colors ${
+              isBiometricUnlocked ? 'bg-emerald-950 border border-emerald-500/40' : 'bg-[#0F172A]'
+            }`}
+          >
+            {isBiometricUnlocked ? (
+              <Unlock className="w-4 h-4 text-emerald-400" />
+            ) : (
+              <Lock className="w-4 h-4 text-emerald-400" />
+            )}
+          </motion.div>
           <div className="min-w-0">
             <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2.5">
               <span className="font-display font-semibold text-sm text-[#0F172A]">
-                Zero-Trust Personal Enclave Active
+                {isBiometricUnlocked
+                  ? 'Biometric Enclave Session Active'
+                  : 'Zero-Trust Personal Enclave Active'}
               </span>
               <span aria-hidden="true" className="hidden sm:inline text-slate-300">
                 ·
               </span>
               <span className="font-mono text-xs text-[#006C49] font-medium">
-                AES-256-GCM Local-First
+                {isBiometricUnlocked ? 'FAR < 0.04% · Verified' : 'AES-256-GCM Local-First'}
               </span>
             </div>
             <div className="mt-1 sm:mt-0.5 text-xs text-slate-600 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-y-0.5 sm:gap-x-2">
@@ -172,23 +198,61 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={onVerifyVault}
-          className="inline-flex items-center justify-center gap-2 px-3.5 py-2 text-xs font-medium text-[#0F172A] bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-        >
-          <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" />
-          Verify Vault Integrity
-        </button>
+        <div className="flex items-center gap-2 flex-wrap shrink-0">
+          {onOpenVoiceBriefing && (
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              type="button"
+              onClick={onOpenVoiceBriefing}
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-mono font-medium text-cyan-800 bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 rounded-lg transition-colors cursor-pointer"
+            >
+              <Radio className="w-3.5 h-3.5 text-cyan-600 animate-pulse" />
+              ElevenLabs Briefing
+            </motion.button>
+          )}
+
+          {onOpenBiometricScan && (
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              type="button"
+              onClick={onOpenBiometricScan}
+              className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-mono font-medium rounded-lg transition-all cursor-pointer ${
+                isBiometricUnlocked
+                  ? 'text-emerald-800 bg-emerald-50 border border-emerald-300'
+                  : 'text-slate-800 bg-slate-100 hover:bg-slate-200 border border-slate-300'
+              }`}
+            >
+              <ScanFace className="w-3.5 h-3.5 text-cyan-600" />
+              {isBiometricUnlocked ? 'Biometric Verified' : 'Scan Face (OpenCV)'}
+            </motion.button>
+          )}
+
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            type="button"
+            onClick={onVerifyVault}
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-medium text-[#0F172A] bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors whitespace-nowrap cursor-pointer shadow-xs"
+          >
+            <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" />
+            Verify Merkle Tree
+          </motion.button>
+        </div>
       </section>
 
       {/* 4-Column Biometric Telemetry Enclave Cards */}
       <section aria-label="Core biometric telemetry">
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-          {enclaveCards.map((card) => (
-            <article
+          {enclaveCards.map((card, idx) => (
+            <motion.article
               key={card.id}
-              className="vault-card rounded-2xl p-5 flex flex-col justify-between gap-4"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: idx * 0.06 }}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="vault-card rounded-2xl p-5 flex flex-col justify-between gap-4 hover:shadow-md transition-shadow"
             >
               <div>
                 <h2 className="font-display font-semibold text-sm text-[#0F172A] truncate">
@@ -224,7 +288,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                   ariaLabel={`${card.title} 14-day sparkline`}
                 />
               </div>
-            </article>
+            </motion.article>
           ))}
         </div>
       </section>
