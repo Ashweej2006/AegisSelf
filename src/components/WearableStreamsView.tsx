@@ -178,7 +178,7 @@ export const WearableStreamsView: React.FC<WearableStreamsViewProps> = ({
 
                   <div className="flex items-center gap-2">
                     <select
-                      aria-label={`Sampling interval for ${device.name}`}
+                      aria-label="Sampling interval"
                       value={device.samplingInterval}
                       onChange={(e) =>
                         onChangeSamplingInterval(
@@ -205,11 +205,11 @@ export const WearableStreamsView: React.FC<WearableStreamsViewProps> = ({
                     <button
                       type="button"
                       onClick={() => onToggleDeviceStream(device.id)}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap cursor-pointer ${
+                      className={
                         isStreaming
-                          ? 'text-[#0F172A] bg-slate-100 hover:bg-slate-200'
-                          : 'text-white bg-[#0F172A] hover:bg-[#1E293B]'
-                      }`}
+                          ? "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap cursor-pointer text-[#0F172A] bg-slate-100 hover:bg-slate-200"
+                          : "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap cursor-pointer text-white bg-[#0F172A] hover:bg-[#1E293B]"
+                      }
                     >
                       {isStreaming ? (
                         <>
@@ -270,18 +270,18 @@ export const WearableStreamsView: React.FC<WearableStreamsViewProps> = ({
                       {isPositive ? 'Direct' : 'Inverse'}
                     </span>
                     <span
-                      className={`font-semibold ${
-                        isPositive ? 'text-[#006C49]' : 'text-[#0090A9]'
-                      }`}
+                      className={
+                        isPositive ? "font-semibold text-[#006C49]" : "font-semibold text-[#0090A9]"
+                      }
                     >
-                      r = {row.r > 0 ? `+${row.r.toFixed(2)}` : row.r.toFixed(2)}
+                      {row.r > 0 ? `r = +${row.r.toFixed(2)}` : `r = ${row.r.toFixed(2)}`}
                     </span>
                   </div>
                   <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full ${
-                        isPositive ? 'bg-[#10B981]' : 'bg-[#06B6D4]'
-                      }`}
+                      className={
+                        isPositive ? "h-full rounded-full bg-[#10B981]" : "h-full rounded-full bg-[#06B6D4]"
+                      }
                       style={{ width: `${Math.max(8, Math.round(absR * 100))}%` }}
                     />
                   </div>

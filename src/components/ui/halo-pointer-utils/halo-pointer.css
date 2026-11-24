@@ -1,0 +1,155 @@
+/* Halo Pointer CSS */
+.hp {
+  position: relative;
+  width: 100%;
+}
+
+.hp[data-live] {
+  cursor: none;
+}
+
+.hp[data-live] * {
+  cursor: none;
+}
+
+/* Allow native cursor in text fields */
+.hp[data-live] input,
+.hp[data-live] textarea,
+.hp[data-live] select,
+.hp[data-live] [contenteditable="true"],
+.hp[data-live] [contenteditable=""] {
+  cursor: auto;
+}
+
+.hp__layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99999;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hp__layer[data-in] {
+  opacity: 1;
+}
+
+/* Arrow */
+.hp__arrow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  will-change: transform;
+  transform-origin: 3px 3px;
+  z-index: 2;
+}
+
+.hp--dark .hp__arrow svg path {
+  fill: #0d0c0b;
+  stroke: #ffffff;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+}
+
+.hp--light .hp__arrow svg path {
+  fill: #ffffff;
+  stroke: #0d0c0b;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
+}
+
+/* Halo */
+.hp__halo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 64px;
+  height: 64px;
+  margin-left: -32px;
+  margin-top: -32px;
+  border-radius: 50%;
+  pointer-events: none;
+  will-change: transform;
+  transform-origin: center center;
+  z-index: 1;
+}
+
+.hp__veil {
+  position: absolute;
+  inset: -28px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--hp-c, #06b6d4) 0%, transparent 70%);
+  opacity: 0.32;
+  filter: blur(14px);
+  pointer-events: none;
+  transition: background 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hp__core {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--hp-c, #06b6d4) 0%, transparent 65%);
+  opacity: 0.65;
+  filter: blur(6px);
+  pointer-events: none;
+  transition: background 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Ring Click Pulse */
+.hp__ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hp__ring span {
+  position: absolute;
+  top: -24px;
+  left: -24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1.5px solid var(--hp-c, #06b6d4);
+  opacity: 0;
+  transform: scale(0.5);
+  pointer-events: none;
+}
+
+.hp__ring[data-pulse="a"] span {
+  animation: hp-ring-pulse-a 0.5s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+}
+
+.hp__ring[data-pulse="b"] span {
+  animation: hp-ring-pulse-b 0.5s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes hp-ring-pulse-a {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@keyframes hp-ring-pulse-b {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}

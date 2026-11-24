@@ -32,6 +32,7 @@ import { SmartContractsView } from './components/SmartContractsView';
 import HalftoneWordmarkFooter from './components/HalftoneWordmarkFooter';
 import { BiometricScanModal } from './components/BiometricScanModal';
 import { VoiceBriefingModal } from './components/VoiceBriefingModal';
+import HaloPointer from './components/ui/halo-pointer';
 
 const STORAGE_KEY = 'aegisself_vault_state_v1';
 
@@ -101,9 +102,24 @@ export default function App() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    const screenParam = params.get('screen') as VaultScreen | null;
+    if (screenParam && ['overview', 'labs', 'wearables', 'anomalies', 'contracts'].includes(screenParam)) {
+      setActiveScreen(screenParam);
+    }
+    if (params.get('biometric') === '1') {
+      setBiometricModalOpen(true);
+    }
+    if (params.get('voice') === '1') {
+      setVoiceBriefingOpen(true);
+    }
     if (params.get('autostart') === '1') {
       const target = document.getElementById('vault-workspace');
       target?.scrollIntoView({ behavior: 'auto' });
+    }
+    if (params.get('footer') === '1') {
+      setTimeout(() => {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
+      }, 300);
     }
   }, []);
 
@@ -500,77 +516,82 @@ export default function App() {
   const latestTelemetry = vault.telemetry[vault.telemetry.length - 1];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#0B1C30]">
-      <HeroAscii
-        vaultId={vault.vaultId}
-        latestHrvMs={latestTelemetry?.hrvMs ?? 56}
-        latestDeepSleepHrs={latestTelemetry?.deepSleepHrs ?? 1.41}
-        latestGlucoseMgDl={latestTelemetry?.glucoseMgDl ?? 101}
-        biomarkerCount={vault.biomarkers.length}
-        flaggedLabCount={flaggedLabCount}
-        activeContractCount={activeContractCount}
-        baselineRiskPct={simulationResult.baselineRiskPct}
-        onEnterVault={handleEnterVault}
-      />
-
-      {/* Smooth Dark-to-Light Obsidian -> Deep Vault Slate -> Clinical Canvas Gradient Transition */}
-      <div
-        aria-label="Encrypted Vault Architecture Transition"
-        data-testid="hero-dashboard-gradient"
-        className="relative w-full overflow-hidden"
-        style={{
-          background:
-            'linear-gradient(180deg, #000000 0%, #070F1E 24%, #0F172A 46%, #334155 68%, #CBD5E1 86%, #F8FAFC 100%)',
-        }}
-      >
-        {/* Subtle Cyan / Emerald Atmospheric Horizon Mist */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_38%,rgba(6,182,212,0.16)_0%,rgba(16,185,129,0.08)_34%,transparent_72%)]"
+    <HaloPointer color="#06b6d4" arrow="light">
+      <div className="min-h-screen bg-[#F8FAFC] text-[#0B1C30]">
+        <HeroAscii
+          vaultId={vault.vaultId}
+          latestHrvMs={latestTelemetry?.hrvMs ?? 56}
+          latestDeepSleepHrs={latestTelemetry?.deepSleepHrs ?? 1.41}
+          latestGlucoseMgDl={latestTelemetry?.glucoseMgDl ?? 101}
+          biomarkerCount={vault.biomarkers.length}
+          flaggedLabCount={flaggedLabCount}
+          activeContractCount={activeContractCount}
+          baselineRiskPct={simulationResult.baselineRiskPct}
+          onEnterVault={handleEnterVault}
         />
 
-        <div className="relative z-10 max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-10 py-14 sm:py-20">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-            {[
-              {
-                index: '01',
-                title: 'Analog Lab Ingestion',
-                detail:
-                  'Printed clinic reports and PDF panels parsed locally via OCR and sealed with deterministic SHA-256 digests.',
-                metric: `${vault.labReports.length} Reports · ${vault.biomarkers.length} Biomarkers`,
-                screen: 'labs' as VaultScreen,
-              },
-              {
-                index: '02',
-                title: 'Wearable Telemetry Fusion',
-                detail:
-                  'Nocturnal HRV, slow-wave sleep, and interstitial glucose correlated continuously without third-party cloud lock-in.',
-                metric: `${vault.wearables.filter((w) => w.status === 'streaming').length} Live Streams · 30d Window`,
-                screen: 'wearables' as VaultScreen,
-              },
-              {
-                index: '03',
-                title: 'Smart Contract Sovereignty',
-                detail:
-                  'Time-bounded, zero-knowledge data access grants deployed and revoked instantaneously under your private key.',
-                metric: `${activeContractCount} Active Grants · AegisZK L2`,
-                screen: 'contracts' as VaultScreen,
-              },
-            ].map((pillar, idx) => (
-              <motion.button
-                key={pillar.index}
-                type="button"
-                onClick={() => handleEnterVault(pillar.screen)}
-                initial={{ opacity: 0, y: 18 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{
-                  duration: 0.45,
-                  delay: idx * 0.08,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-                className="group text-left p-5 sm:p-6 rounded-2xl bg-[#0F172A]/68 backdrop-blur-md border border-white/12 hover:border-[#06B6D4]/60 transition-colors cursor-pointer"
-              >
+        {/* Smooth Dark-to-Light Obsidian -> Deep Vault Slate -> Clinical Canvas Gradient Transition */}
+        <div
+          aria-label="Encrypted Vault Architecture Transition"
+          data-testid="hero-dashboard-gradient"
+          className="relative w-full overflow-hidden"
+          style={{
+            background:
+              'linear-gradient(180deg, #000000 0%, #070F1E 24%, #0F172A 46%, #334155 68%, #CBD5E1 86%, #F8FAFC 100%)',
+          }}
+        >
+          {/* Subtle Cyan / Emerald Atmospheric Horizon Mist */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_38%,rgba(6,182,212,0.16)_0%,rgba(16,185,129,0.08)_34%,transparent_72%)]"
+          />
+
+          <div className="relative z-10 max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-10 py-14 sm:py-20">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+              {[
+                {
+                  index: '01',
+                  title: 'Analog Lab Ingestion',
+                  detail:
+                    'Printed clinic reports and PDF panels parsed locally via OCR and sealed with deterministic SHA-256 digests.',
+                  metric: `${vault.labReports.length} Reports · ${vault.biomarkers.length} Biomarkers`,
+                  screen: 'labs' as VaultScreen,
+                  halo: '#06b6d4',
+                },
+                {
+                  index: '02',
+                  title: 'Wearable Telemetry Fusion',
+                  detail:
+                    'Nocturnal HRV, slow-wave sleep, and interstitial glucose correlated continuously without third-party cloud lock-in.',
+                  metric: `${vault.wearables.filter((w) => w.status === 'streaming').length} Live Streams · 30d Window`,
+                  screen: 'wearables' as VaultScreen,
+                  halo: '#10b981',
+                },
+                {
+                  index: '03',
+                  title: 'Smart Contract Sovereignty',
+                  detail:
+                    'Time-bounded, zero-knowledge data access grants deployed and revoked instantaneously under your private key.',
+                  metric: `${activeContractCount} Active Grants · AegisZK L2`,
+                  screen: 'contracts' as VaultScreen,
+                  halo: '#8b5cf6',
+                },
+              ].map((pillar, idx) => (
+                <motion.button
+                  key={pillar.index}
+                  type="button"
+                  data-halo={pillar.halo}
+                  onClick={() => handleEnterVault(pillar.screen)}
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{
+                    duration: 0.45,
+                    delay: idx * 0.08,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                  className="group text-left p-5 sm:p-6 rounded-2xl bg-[#0F172A]/68 backdrop-blur-md border border-white/12 hover:border-[#06B6D4]/60 transition-colors cursor-pointer"
+                >
                 <div className="flex items-center justify-between gap-2 text-xs font-mono">
                   <span className="text-[#06B6D4]">{pillar.index}</span>
                   <span className="text-emerald-300/90 tabular-nums">
@@ -742,5 +763,6 @@ export default function App() {
         vaultId={vault.vaultId}
       />
     </div>
+    </HaloPointer>
   );
 }
